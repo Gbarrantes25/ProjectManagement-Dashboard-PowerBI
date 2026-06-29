@@ -1,4 +1,4 @@
-# CFO Dashboard
+# Project Management Dashboard
 
 ## 📃 Descripción General
 Dashboard ejecutivo para Directores Financieros (CFO) desarrollado en Power BI, diseñado para centralizar y analizar el estado financiero de una cadena de restaurantes en tiempo real.
