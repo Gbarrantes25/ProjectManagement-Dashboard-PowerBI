@@ -379,7 +379,368 @@ Este proyecto se conecta a una base de datos remota NeonTech (PostgreSQL) transf
     
     - CardOverview:
       ```
+      VAR _VirtualProjectsTable = 
+        CALCULATETABLE(
+            ADDCOLUMNS(
+                SUMMARIZE(DimProjects, DimProjects[project_id]),
+                "@Status", [Status],
+                "@StatusAlert", [Status_Alert]
+            ),
+            ALLSELECTED()
+        )
+      VAR _Budget_Format = 
+          SWITCH(TRUE(),
+              [#BU] >= 1000000, FORMAT([#BU] / 1000000, "$0.0") & "M",
+              [#BU] >= 1000, FORMAT([#BU] / 1000, "$0.0") & "K",
+              FORMAT([#BU], "$#,##0")
+          )
+      VAR _AC_Format = 
+          SWITCH(TRUE(),
+              [#AC] >= 1000000, FORMAT([#AC] / 1000000, "$0.0") & "M",
+              [#AC] >= 1000, FORMAT([#AC] / 1000, "$0.0") & "K",
+              FORMAT([#AC], "$#,##0")
+          )
+      VAR _CV_Format = 
+          SWITCH(TRUE(),
+              [#CV] >= 1000000, FORMAT([#CV] / 1000000, "$0.0") & "M",
+              [#CV] >= 1000, FORMAT([#CV] / 1000, "$0.0") & "K",
+              FORMAT([#CV], "$#,##0")
+          )
+      VAR _CPI_Format = 
+          SWITCH(TRUE(),
+              [#CPI] >= 1000000, FORMAT([#CPI] / 1000000, "0.00") & "M",
+              [#CPI] >= 1000, FORMAT([#CPI] / 1000, "0.00") & "K",
+              FORMAT(ROUND([#CPI],2),"#0.00","En-US")
+          )
+      VAR _SPI_Format = 
+          SWITCH(TRUE(),
+              [#SPI] >= 1000000, FORMAT([#SPI] / 1000000, "0.00") & "M",
+              [#SPI] >= 1000, FORMAT([#SPI] / 1000, "0.00") & "K",
+              FORMAT([#SPI], "#0.00","En-US")
+          )
+      VAR _EAC_Format = 
+          SWITCH(TRUE(),
+              [#EAC] >= 1000000, FORMAT([#EAC] / 1000000, "$0.0") & "M",
+              [#EAC] >= 1000, FORMAT([#EAC] / 1000, "$0.0") & "K",
+              FORMAT([#EAC], "$#,##0")
+          )
       
+      VAR _VAC_Format = 
+          SWITCH(TRUE(),
+              [#VAC] >= 1000000, FORMAT([#VAC] / 1000000, "$0.0") & "M",
+              [#VAC] >= 1000, FORMAT([#VAC] / 1000, "$0.0") & "K",
+              FORMAT([#VAC], "$#,##0")
+          )
+      
+      VAR _CountDone = COUNTROWS(FILTER(
+                                  _VirtualProjectsTable,
+                                  [@Status] = "Done"
+                              ))
+      
+      VAR _CountInProgress = COUNTROWS(FILTER(
+                                  _VirtualProjectsTable,
+                                  [@Status] = "In Progress"
+                              ))
+      
+      VAR _CountToDo = COUNTROWS(FILTER(
+                                  _VirtualProjectsTable,
+                                  [@Status] = "To Do"
+                              ))
+      
+      VAR _CountAtRisk = COUNTROWS(FILTER(
+                                  _VirtualProjectsTable,
+                                  [@StatusAlert] = "Critical" || [@StatusAlert] = "At Risk"
+                              ))
+
+      RETURN
+      "
+      <html lang='es'>
+      <style>
+      :root{
+          --bg:#f4f7fb;
+          --card-radius:18px;
+          --shadow:0 10px 25px rgba(0,0,0,.10);
+          --text:#ffffff;
+      }
+      
+      *{
+          margin:0;
+          padding:0;
+          box-sizing:border-box;
+          font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      body{
+          background:var(--bg);
+          padding:30px;
+      }
+      
+      .kpi-grid{
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(165px,1fr));
+          gap:8px;
+      }
+      
+      .kpi-card{
+          position:relative;
+          overflow:hidden;
+          border-radius:var(--card-radius);
+          padding:30px;
+          color:var(--text);
+          box-shadow:var(--shadow);
+          transition:.3s ease;
+      }
+      
+      .kpi-card:hover{
+          transform:translateY(-4px);
+      }
+      
+      .kpi-card::before{
+          content:'';
+          position:absolute;
+          top:-40px;
+          right:-40px;
+          width:110px;
+          height:110px;
+          border-radius:50%;
+          background:rgba(255,255,255,.12);
+      }
+      
+      .kpi-header{
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          margin-bottom:10px;
+      }
+      
+      .kpi-title{
+          font-size:.75rem;
+          font-weight:700;
+          opacity:.95;
+      }
+      
+      .kpi-icon{
+          width:40px;
+          height:40px;
+          border-radius:12px;
+          background:rgba(255,255,255,.18);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:18px;
+          backdrop-filter:blur(5px);
+      }
+      
+      .kpi-value{
+          font-size:1.2rem;
+          font-weight:700;
+          line-height:1;
+      }
+      
+      .kpi-footer{
+          margin-top:10px;
+          font-size:.85rem;
+          opacity:.9;
+      }
+      
+      /* Gradientes individuales */
+      .projects{
+          background:linear-gradient(135deg,#4D70FF,#40ADF6);
+      }
+      
+      .ToDo{
+          background:linear-gradient(135deg,#757DFC,#CB7AFE);
+      }
+      
+      .InProgress{
+          background:linear-gradient(135deg,#E8697D,#EC9B65);
+      }
+      
+      .Done{
+          background:linear-gradient(135deg,#28a37d,#43D79D);
+      }
+      
+      .AtRisk{
+          background:linear-gradient(135deg,#d7327d,#E8697D);
+      }
+      
+      
+      .Budget, .Ac, .CV, .EAC, .VAC, .CPI, .SPI{
+          background:linear-gradient(135deg,#4E6483,#99AAC2);
+      }
+      
+      
+      </style>
+      <body>
+      
+      <div class='kpi-grid'>
+      
+          <!-- Total Proyectos -->
+          <div class='kpi-card projects'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>Total Projects</div>
+                  <div class='kpi-icon'>📁</div>
+              </div>
+              <div class='kpi-value'>"&[#ProjectsQuantity]&"</div>
+          </div>
+      
+          <!-- Status To Do -->
+          <div class='kpi-card ToDo'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>To-Do</div>
+                  <div class='kpi-icon'>⏳</div>
+              </div>
+              <div class='kpi-value'>"&_CountToDo&"</div>
+          </div>
+      
+          <!-- Status In Progress -->
+          <div class='kpi-card InProgress'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>In Progress</div>
+                  <div class='kpi-icon'>📌</div>
+              </div>
+              <div class='kpi-value'>"&_CountInProgress&"</div>
+          </div>
+      
+          <!-- Status Done -->
+          <div class='kpi-card Done'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>Done</div>
+                  <div class='kpi-icon'>✅</div>
+              </div>
+              <div class='kpi-value'>"&_CountDone&"</div>
+          </div>
+      
+          <!-- Status Alert At Risk -->
+          <div class='kpi-card AtRisk'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>At Risk</div>
+                  <div class='kpi-icon'>🚨</div>
+              </div>
+              <div class='kpi-value'>"&_CountAtRisk&"</div>
+          </div>
+      
+          <!-- Budget -->
+          <div class='kpi-card Budget'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>Total Budget</div>
+                  <div class='kpi-icon'>💰</div>
+              </div>
+              <div class='kpi-value'>"&_Budget_Format&"</div>
+          </div>
+      
+          <!-- AC -->
+          <div class='kpi-card Ac'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>Total AC</div>
+                  <div class='kpi-icon'>💵</div>
+              </div>
+              <div class='kpi-value'>"&_AC_Format&"</div>
+          </div>
+      
+          <!-- CV -->
+          <div class='kpi-card CV'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>CV</div>
+                  <div class='kpi-icon'>🎛</div>
+              </div>
+              <div class='kpi-value'>"&_CV_Format&"</div>
+          </div>
+      
+          <!-- EAC -->
+          <div class='kpi-card EAC'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>EAC</div>
+                  <div class='kpi-icon'>🎯</div>
+              </div>
+              <div class='kpi-value'>"&_EAC_Format&"</div>
+          </div>
+      
+          <!-- VAC -->
+          <div class='kpi-card VAC'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>VAC</div>
+                  <div class='kpi-icon'>📊</div>
+              </div>
+              <div class='kpi-value'>"&_VAC_Format&"</div>
+          </div>
+      
+          <!-- CPI -->
+          <div class='kpi-card CPI'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>CPI</div>
+                  <div class='kpi-icon'>🚦</div>
+              </div>
+              <div class='kpi-value'>"&_CPI_Format&"</div>
+          </div>
+      
+          <!-- SPI -->
+          <div class='kpi-card SPI'>
+              <div class='kpi-header'>
+                  <div class='kpi-title'>SPI</div>
+                  <div class='kpi-icon'>📆</div>
+              </div>
+              <div class='kpi-value'>"&_SPI_Format&"</div>
+          </div>
+      
+      </div>
+      </body>
+      </html>
+      "
+      ```
+  </details>
+  
+  - <details><summary>YTD:</summary>
+
+    - #AC_YTD:
+      ``` 
+    	VAR _DateMax = EOMONTH(
+    		TODAY(),
+    		0
+    	)
+    	VAR _Result = IF(
+    		MAX(DimCalendar[Date]) <= _DateMax,
+    		TOTALYTD(
+    			[#AC],
+    			DimCalendar[Date],
+    			DimCalendar[Date] <= _DateMax
+    		),
+    		BLANK()
+    	)
+    	RETURN
+    		_Result
+      ```
+    - #BU_YTD:
+      ``` 
+    	VAR _DateMax = EOMONTH(
+    		TODAY(),
+    		0
+    	)
+    	VAR _Result =
+    	IF(
+    		MAX(DimCalendar[Date]) <= _DateMax,
+    		TOTALYTD(
+    			[#BU],
+    			DimCalendar[Date],
+    			DimCalendar[Date] <= _DateMax
+    		),
+    		BLANK()
+    	)
+    
+    	RETURN
+    		_Result
+      ```
+    - #EV_YTD:
+      ``` 
+      VAR _Todaydate = EOMONTH(TODAY(),0)
+      VAR _Result = IF(MAX(DimCalendar[Date]) <= _Todaydate,[#EV],BLANK())
+      RETURN _Result
+      ```
+    - #PV_YTD:
+      ``` 
+      VAR _Todaydate = EOMONTH(TODAY(),0)
+      VAR _Result = IF(MAX(DimCalendar[Date]) <= _Todaydate,[#PV],BLANK())
+      RETURN _Result
       ```
   </details>
 - Diseño Interactivo: Uso de paginado para navegación y segmentación de datos.
@@ -387,10 +748,9 @@ Este proyecto se conecta a una base de datos remota NeonTech (PostgreSQL) transf
 ## 🖼️ Vistas Previas del proyecto
 <details>
   <summary>Capturas</summary>
-    <img width="1911" height="1064" alt="image" src="https://github.com/user-attachments/assets/a5976e58-5afd-4d45-ac86-79416ee37b7d" />
-    <img width="1910" height="1067" alt="image" src="https://github.com/user-attachments/assets/65107f03-de5f-4e78-89cf-f04146ff8ab0" />
-    <img width="1905" height="1060" alt="image" src="https://github.com/user-attachments/assets/7ac6b2d9-ecb9-4628-add3-75c9ee545ac6" />
-
+    <img width="1924" height="1070" alt="image" src="https://github.com/user-attachments/assets/3fb03df8-501b-4d0c-aae9-e0393e3b4d21" />
+    <img width="1930" height="1068" alt="image" src="https://github.com/user-attachments/assets/ee660bad-d843-4dd2-a1da-fdf3dcef3073" />
+    <img width="1920" height="1071" alt="image" src="https://github.com/user-attachments/assets/e0e5f555-9c72-4518-84be-d68d4a6ad3cf" />
 </details>
 
 <details>
