@@ -34,7 +34,7 @@ Este proyecto se conecta a una base de datos remota NeonTech (PostgreSQL) transf
 - Entrar a NeonTech (https://neon.com/)
 - Neontech Credenciales:
   - Nos dirigimos al apartado "Connect to your project"/"Connection String", esto logrará que tengas credenciales similares a esta:
-  - "postgresql://neondb_owner:YOURPASSWORD@ep-old-cloud-a8jxpwbf-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require", y se desglosará de la siguiente manera:
+  - ```"postgresql://neondb_owner:YOURPASSWORD@ep-old-cloud-a8jxpwbf-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require"```, y se desglosará de la siguiente manera:
     - Database: neondb
     - Server: ep-old-cloud-a8jxpwbf-pooler.eastus2.azure.neon.tech
     - Port: 5432
