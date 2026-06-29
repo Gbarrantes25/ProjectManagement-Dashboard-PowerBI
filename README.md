@@ -143,9 +143,9 @@ Este proyecto se conecta a una base de datos remota NeonTech (PostgreSQL) transf
 
 ## 📂 Estructura del Repositorio
 <code>.
-  ├── Data Source                        # Contiene la tabla en formato .csv
-  ├── Project Management Dashboard.pbix  # Archivo que será ejecutado con Power BI Desktop.
-  └── README.md                          # Este archivo.
+  ├── Data Source                    # Contiene la tabla en formato .csv
+  ├── Project Management.pbix        # Archivo que será ejecutado con Power BI Desktop.
+  └── README.md                      # Este archivo.
 </code>
 
 
