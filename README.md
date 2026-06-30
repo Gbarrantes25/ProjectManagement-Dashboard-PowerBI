@@ -755,7 +755,7 @@ Este proyecto se conecta a una base de datos remota NeonTech (PostgreSQL) transf
 
 <details>
   <summary>Video</summary>
-  https://www.youtube.com/watch?v=ISpue331_Y8
+  https://youtu.be/waNBncOlGs4
 </details>
 
 
