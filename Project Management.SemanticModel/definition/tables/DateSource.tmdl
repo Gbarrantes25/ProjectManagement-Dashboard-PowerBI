@@ -1,0 +1,32 @@
+table DateSource
+	lineageTag: 1d97eeea-d9a3-4a36-8d46-f77e7a742e0e
+
+	column FDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 042ad1bb-5e83-4e6c-9233-6551312ebd1c
+		summarizeBy: none
+		sourceColumn: FDate
+
+		variation Variación
+			isDefault
+			relationship: ce6492f4-e09a-4ec3-aa6a-9f0d7b9c8d6d
+			defaultHierarchy: LocalDateTable_2ef66682-efd6-4741-a9e2-9b49a966095c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition DateSource = m
+		mode: import
+		source =
+				let
+				    Origen = Value.NativeQuery(PostgreSQL.Database("ep-odd-moon-aj7fxpfo-pooler.c-3.us-east-2.aws.neon.tech", "neondb"), "SELECT planned_startdate as ""FDate"" from projects where planned_startdate is not NULL#(lf)UNION ALL#(lf)SELECT planned_enddate from projects where planned_enddate is not NULL#(lf)UNION ALL#(lf)SELECT real_startdate from projects where real_startdate is not NULL#(lf)UNION ALL#(lf)SELECT real_enddate from projects where real_enddate is not NULL#(lf)ORDER BY ""FDate""", null, [EnableFolding=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"FDate", type date}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

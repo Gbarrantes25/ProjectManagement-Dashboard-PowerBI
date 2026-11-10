@@ -1,0 +1,35 @@
+table DimPhase
+	lineageTag: c082fdf3-fd90-4ed5-bd51-9c8ec5820e68
+
+	column phase_id
+		dataType: int64
+		formatString: 0
+		lineageTag: eed05bb9-8245-453a-a918-d81628e26ef6
+		summarizeBy: none
+		sourceColumn: phase_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column phase
+		dataType: string
+		lineageTag: d8ec3bfb-a80a-474c-8642-0f8ab747dbc0
+		summarizeBy: none
+		sourceColumn: phase
+		sortByColumn: phase_id
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimPhase = m
+		mode: import
+		source =
+				let
+				    Origen = Value.NativeQuery(PostgreSQL.Database("ep-odd-moon-aj7fxpfo-pooler.c-3.us-east-2.aws.neon.tech", "neondb"), "SELECT DISTINCT phase_id,phase FROM projects ORDER BY phase_id", null, [EnableFolding=true])
+				in
+				    Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

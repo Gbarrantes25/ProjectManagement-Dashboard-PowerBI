@@ -1,0 +1,12 @@
+EVALUATE
+	COUNTROWS(FILTER(
+		ADDCOLUMNS(
+			SUMMARIZE(
+				Fact_Task,
+				DimTask[task_id]
+			),
+			"Status1", [Status]
+		),
+		[Status1] = "Done"
+	)
+	)
