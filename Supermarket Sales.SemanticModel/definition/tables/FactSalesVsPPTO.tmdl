@@ -1,0 +1,76 @@
+table FactSalesVsPPTO
+	lineageTag: 7b63276f-85e3-4006-a28a-73e8ecc350ab
+
+	column Id_Tienda
+		dataType: int64
+		formatString: 0
+		lineageTag: fafbff80-7282-4727-b8ff-642c39ce40e3
+		summarizeBy: none
+		sourceColumn: Id_Tienda
+
+		annotation SummarizationSetBy = User
+
+	column Año
+		dataType: double
+		lineageTag: c3029178-651c-4dc2-8c10-ac120a0998fb
+		summarizeBy: none
+		sourceColumn: Año
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Mes
+		dataType: double
+		lineageTag: 7d80982e-6531-4899-8b7d-a3bd2e7379c3
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Ventas
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 868777ed-62ec-4aa1-8d51-4639a0af0270
+		summarizeBy: none
+		sourceColumn: Ventas
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Presupuesto
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 09176f02-21a0-4fb8-b53c-8f6b49c575e3
+		summarizeBy: none
+		sourceColumn: Presupuesto
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column FechaPPTO = DATE([Año],[Mes],01)
+		formatString: dd/mm/yyyy
+		lineageTag: 3703cf33-3df9-417c-91cc-1d5e41c8a211
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition FactSalesVsPPTO = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("ep-muddy-field-awq13mvt-pooler.c-12.us-east-1.aws.neon.tech", "neondb", [Query="SELECT * FROM ""FactSalesVsPPTO"""]),
+				    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"año", "Año"}, {"mes", "Mes"}, {"ventas", "Ventas"}, {"presupuesto", "Presupuesto"}})
+				in
+				    #"Columnas con nombre cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

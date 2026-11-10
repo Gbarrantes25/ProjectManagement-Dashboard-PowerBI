@@ -1,0 +1,50 @@
+table DimProducts
+	lineageTag: edc9a69d-8e15-4f27-ab93-d3a40bd534a7
+
+	column Id_Producto
+		dataType: int64
+		formatString: 0
+		lineageTag: b1e6e970-8a66-42a5-bcfb-0080901def8b
+		summarizeBy: none
+		sourceColumn: Id_Producto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Producto
+		dataType: string
+		lineageTag: 47457f55-1eea-4a62-8560-c9024800e90c
+		summarizeBy: none
+		sourceColumn: Producto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria
+		dataType: string
+		lineageTag: 54264cbc-be14-4e30-b285-126e1a5c2c5d
+		summarizeBy: none
+		sourceColumn: Categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column Precio_Unit
+		dataType: double
+		lineageTag: 3c905bdb-df40-4916-8c69-f5b8d3c1314c
+		summarizeBy: none
+		sourceColumn: Precio_Unit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DimProducts = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("ep-muddy-field-awq13mvt-pooler.c-12.us-east-1.aws.neon.tech", "neondb", [Query="SELECT * FROM ""DimProducts"""])
+				in
+				    Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Supermarket Sales"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a17f1ea1-eb56-412f-9e6d-6e2561e0aacd"
+  }
+}

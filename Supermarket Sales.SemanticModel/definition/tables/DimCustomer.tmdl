@@ -1,0 +1,32 @@
+table DimCustomer
+	lineageTag: ac9fae86-6bea-4e0a-b66d-b7acf7105605
+
+	column Id_Cliente
+		dataType: int64
+		formatString: 0
+		lineageTag: 5add2303-d30a-4686-8c6a-0724bfb15eba
+		summarizeBy: none
+		sourceColumn: Id_Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nombre
+		dataType: string
+		lineageTag: af867185-e091-4549-8981-ddf6990d380a
+		summarizeBy: none
+		sourceColumn: Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCustomer = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("ep-muddy-field-awq13mvt-pooler.c-12.us-east-1.aws.neon.tech", "neondb", [Query="SELECT * FROM ""DimCustomer"""])
+				in
+				    Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

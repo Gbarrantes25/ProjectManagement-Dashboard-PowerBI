@@ -1,0 +1,927 @@
+table Measure
+	lineageTag: f2d08def-35b9-4577-8d33-32e449ecb5b2
+
+	measure #TotalSales = SUMX(FactSales,FactSales[Cantidad]*RELATED(DimProducts[Precio_Unit]))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: e056b0f8-eec9-447f-8293-243ecea333b3
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-US"}
+
+	measure #TotalBudget =
+			
+			VAR SelectedBranch = SELECTEDVALUE(DimBranch[Id_Tienda])
+			VAR ppto = SUMX(FILTER(FactSalesVsPPTO,FactSalesVsPPTO[Id_Tienda]=SelectedBranch),FactSalesVsPPTO[Presupuesto])
+			RETURN IF(ISBLANK(ppto),SUMX(FactSalesVsPPTO,FactSalesVsPPTO[Presupuesto]),ppto)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: 3da745b5-c4da-4f17-bb08-8003d9c150d1
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure #%Goal =
+			
+			VAR _goal = DIVIDE([#TotalSales],[#TotalBudget],0)
+			VAR _result = IF(_goal>1,1,_goal)
+			RETURN _result
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: c4c784ec-33b1-4d27-952b-07ce893361d1
+
+	measure #%GoalTarget = 1
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: 9ab1a021-540b-43fb-831d-ae6deb18289c
+
+	measure CardSales_Budget = ```
+			
+			
+			VAR bg = MAXX(Mode,Mode[BgVisual])
+			VAR _textmain = IF(SELECTEDVALUE(Mode[Activo])=0,MAXX(Mode,Mode[TextoPrincipal]),"#00ffcc")
+			VAR _textsec = MAXX(Mode,Mode[TextoPrincipal])
+			VAR bordecard = IF(SELECTEDVALUE(Mode[Activo])=0,_textsec,bg)
+			VAR ingresoslogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/IngresosLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/IngresosDark.png")
+			VAR pptologo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ObjetivoLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ObjetivoDark.png")
+			VAR ingresos = [TotalSalesFormat]
+			VAR ppto = [TotalBudgetFormat]
+			VAR textfront = "Sales"
+			VAR textback = "Budget"
+			
+			RETURN
+			"
+			<head>
+			 <style>
+			.card {
+			  width: 270px;
+			  height: 150px;
+			  perspective: 1000px;
+			}
+			
+			.card-inner {
+			  width: 100%;
+			  height: 100%;
+			  position: relative;
+			  transform-style: preserve-3d;
+			  transition: transform 0.999s;
+			}
+			
+			.card:hover .card-inner {
+			  transform: rotateY(180deg);
+			}
+			
+			.card-front,
+			.card-back {
+			  position: absolute;
+			  width: 100%;
+			  height: 100%;
+			  backface-visibility: hidden;
+			  display: flex;
+			  flex-direction: column;
+			}
+			
+			.card-front {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(0deg);
+			}
+			
+			.card-back {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(180deg);
+			}
+			
+			p {
+			  font-size: 0.8rem;
+			  display: flex;
+			  flex-direction: row;
+			  justify-content: center;
+			  align-items: center;
+			  gap: 5px;
+			  color: "&_textsec&";
+			}
+			
+			h3 {
+			  color:"&_textmain&";
+			  font-weight: bold;
+			}
+			
+			
+			 </style>   
+			</head>
+			<div class='card'>
+			  <div class='card-inner'>
+			    <div class='card-front'>
+			      <h3>"&ingresos&"</h3>
+			      <p><img src='"&ingresoslogo&"' width='26px'>"&textfront&"</p>
+			    </div>
+			    <div class='card-back'>
+			      <h3>"&ppto&"</h3>
+			      <p><img src='"&pptologo&"' width='26px'>"&textback&"</p>
+			    </div>
+			  </div>
+			</div>
+			"
+			```
+		displayFolder: VisualesHTML
+		lineageTag: 5acc75f5-2995-4b8a-9f2e-9c8629266bca
+
+	measure TotalSalesFormat = ```
+			
+			Fx_FormatNumberUSD([#TotalSales])
+			
+			```
+		displayFolder: KPIs_Format
+		lineageTag: 6be9ce18-bbe9-424a-b7a1-3e77743a738f
+
+	measure TotalBudgetFormat =
+			
+			Fx_FormatNumberUSD([#TotalBudget])
+		displayFolder: KPIs_Format
+		lineageTag: 47aa8b12-33db-4644-bf15-da7ad5bf3b1c
+
+	measure #AverageTicket =
+			
+			VAR transactions = DISTINCTCOUNT(FactSales[Id_transaccion])
+			RETURN DIVIDE([#TotalSales],transactions,0)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: cdba6eb4-fcf9-43d7-8231-ea21a780cab7
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-US"}
+
+	measure CardAverageTicket_GAPSelling = ```
+			
+			
+			VAR bg = MAXX(Mode,Mode[BgVisual])
+			var _textsec = MAXX(Mode,Mode[TextoPrincipal])
+			VAR _textmain = IF(SELECTEDVALUE(Mode[Activo])=0,MAXX(Mode,Mode[TextoPrincipal]),"#00ffcc")
+			VAR bordecard = IF(SELECTEDVALUE(Mode[Activo])=0,_textsec,bg)
+			VAR ticketlogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/TicketLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/TicketDark.png")
+			VAR gaplogo =
+			    SWITCH(TRUE(),
+			    SELECTEDVALUE(Mode[Activo])=0 && [#GAPSelling]>0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ArribaLight.png",
+			    SELECTEDVALUE(Mode[Activo])=0 && [#GAPSelling]<0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/AbajoLight.png",
+			    SELECTEDVALUE(Mode[Activo])=1 && [#GAPSelling]>0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ArribaDark.png",
+			    SELECTEDVALUE(Mode[Activo])=1 && [#GAPSelling]<0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/AbajoDark.png",
+			    SELECTEDVALUE(Mode[Activo])=0 && [#GAPSelling]=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/FlechaLight.png",
+			    SELECTEDVALUE(Mode[Activo])=1 && [#GAPSelling]=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/FlechaDark.png")
+			VAR ticket = [AverageTicketFormat]
+			VAR gap = [GAPFormat]
+			VAR textfront = "Average Ticket"
+			VAR textback = "GAP Selling"
+			
+			RETURN
+			"
+			<head>
+			 <style>
+			.card {
+			  width: 270px;
+			  height: 150px;
+			  perspective: 1000px;
+			}
+			
+			.card-inner {
+			  width: 100%;
+			  height: 100%;
+			  position: relative;
+			  transform-style: preserve-3d;
+			  transition: transform 0.999s;
+			}
+			
+			.card:hover .card-inner {
+			  transform: rotateY(180deg);
+			}
+			
+			.card-front,
+			.card-back {
+			  position: absolute;
+			  width: 100%;
+			  height: 100%;
+			  backface-visibility: hidden;
+			  display: flex;
+			  flex-direction: column;
+			}
+			
+			.card-front {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(0deg);
+			}
+			
+			.card-back {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(180deg);
+			}
+			
+			p {
+			  font-size: 0.8rem;
+			  display: flex;
+			  flex-direction: row;
+			  justify-content: center;
+			  align-items: center;
+			  gap: 5px;
+			  color: "&_textsec&";
+			}
+			
+			h3 {
+			  color:"&_textmain&";
+			  font-weight: bold;
+			}
+			
+			
+			 </style>   
+			</head>
+			<div class='card'>
+			  <div class='card-inner'>
+			    <div class='card-front'>
+			      <h3>"&ticket&"</h3>
+			      <p><img src='"&ticketlogo&"' width='26px'>"&textfront&"</p>
+			    </div>
+			    <div class='card-back'>
+			      <h3>"&[GAPFormat]&"</h3>
+			      <p><img src='"&gaplogo&"' width='26px'>"&textback&"</p>
+			    </div>
+			  </div>
+			</div>
+			"
+			```
+		displayFolder: VisualesHTML
+		lineageTag: 1f4f8c69-d9da-40e0-8af8-05ea63677b1b
+
+	measure AverageTicketFormat = ```
+			
+			Fx_FormatNumberUSD([#AverageTicket])
+			
+			
+			```
+		displayFolder: KPIs_Format
+		lineageTag: 8d724f2d-2f95-497c-8d53-97f2ce278b3b
+
+	measure #GAPSelling = [#TotalSales]-[#TotalBudget]
+		formatString: \$#,0;(\$#,0);\$#,0
+		displayFolder: KPIs
+		lineageTag: 90ef2815-50db-47ca-9db9-205d6dce6ea8
+
+	measure GAPFormat = ```
+			
+			Fx_FormatNumberUSD([#GAPSelling])
+			
+			```
+		displayFolder: KPIs_Format
+		lineageTag: fff9a66f-4655-49d8-a501-d9d7a92ad81b
+
+	measure ColourBar = IF(SELECTEDVALUE(Mode[Activo])=1,"#00ffcc","#00A383")
+		displayFolder: ColourDesign
+		lineageTag: bba66d2f-430b-4834-b7b5-9c64803c90fe
+
+	measure Img_Menubar =
+			
+			VAR light = "https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/MenuLight.png"
+			VAR dark = "https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/MenuDark.png"
+			
+			RETURN IF(SELECTEDVALUE(Mode[Activo])=0,light,dark)
+		displayFolder: Images
+		lineageTag: 9dbf1309-cfc1-4f81-9deb-4ae9108934af
+
+	measure #Units = SUMX(FactSales,FactSales[Cantidad])
+		formatString: 0
+		displayFolder: KPIs
+		lineageTag: 54e26722-d910-496e-b9a5-a13bb56c3710
+
+	measure #QuantityProducts = DISTINCTCOUNT(FactSales[Id_Producto])
+		formatString: 0
+		displayFolder: KPIs
+		lineageTag: a3232a91-e168-403b-b026-269f9ffb5a0e
+
+	measure UnitsFormat = ```
+			
+			Fx_FormatNumber([#Units])
+			
+			```
+		displayFolder: KPIs_Format
+		lineageTag: 82dafe4f-f1b8-40c9-b806-857b2d979fb5
+
+	measure QuantityProductsFormat = ```
+			
+			Fx_FormatNumber([#QuantityProducts])
+			
+			```
+		displayFolder: KPIs_Format
+		lineageTag: 25933a9f-4f7e-4753-9568-dd700eb6dc61
+
+	measure Img_MenubarClose =
+			
+			VAR light = "https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/CerrarLight.png"
+			VAR dark = "https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/CerrarDark.png"
+			
+			RETURN IF(SELECTEDVALUE(Mode[Activo])=0,light,dark)
+		displayFolder: Images
+		lineageTag: e3472756-22a1-4be8-b78b-5f400075debe
+
+	measure CardUnits_Products = ```
+			
+			
+			VAR bg = MAXX(Mode,Mode[BgVisual])
+			var _textsec = MAXX(Mode,Mode[TextoPrincipal])
+			VAR _textmain = IF(SELECTEDVALUE(Mode[Activo])=0,MAXX(Mode,Mode[TextoPrincipal]),"#00ffcc")
+			VAR bordecard = IF(SELECTEDVALUE(Mode[Activo])=0,_textsec,bg)
+			VAR unidadeslogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/UnidadesLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/UnidadesDark.png")
+			VAR productlogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ProductsLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ProductsDark.png")
+			VAR unidades = [UnitsFormat]
+			VAR products = [QuantityProductsFormat]
+			VAR textfront = "Units"
+			VAR textback = "Products"
+			
+			RETURN
+			"
+			<head>
+			 <style>
+			.card {
+			  width: 270px;
+			  height: 150px;
+			  perspective: 1000px;
+			}
+			
+			.card-inner {
+			  width: 100%;
+			  height: 100%;
+			  position: relative;
+			  transform-style: preserve-3d;
+			  transition: transform 0.999s;
+			}
+			
+			.card:hover .card-inner {
+			  transform: rotateY(180deg);
+			}
+			
+			.card-front,
+			.card-back {
+			  position: absolute;
+			  width: 100%;
+			  height: 100%;
+			  backface-visibility: hidden;
+			  display: flex;
+			  flex-direction: column;
+			}
+			
+			.card-front {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(0deg);
+			}
+			
+			.card-back {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(180deg);
+			}
+			
+			p {
+			  font-size: 0.8rem;
+			  display: flex;
+			  flex-direction: row;
+			  justify-content: center;
+			  align-items: center;
+			  gap: 5px;
+			  color: "&_textsec&";
+			}
+			
+			h3 {
+			  color:"&_textmain&";
+			  font-weight: bold;
+			}
+			
+			
+			 </style>   
+			</head>
+			<div class='card'>
+			  <div class='card-inner'>
+			    <div class='card-front'>
+			      <h3>"&unidades&"</h3>
+			      <p><img src='"&unidadeslogo&"' width='26px'>"&textfront&"</p>
+			    </div>
+			    <div class='card-back'>
+			      <h3>"&products&"</h3>
+			      <p><img src='"&productlogo&"' width='26px'>"&textback&"</p>
+			    </div>
+			  </div>
+			</div>
+			"
+			```
+		displayFolder: VisualesHTML
+		lineageTag: 588946c5-fab2-4e87-9df3-0da8a9101975
+
+	measure #YearvsLY =
+			
+			VAR lastyear = CALCULATE([#TotalSales],SAMEPERIODLASTYEAR('Calendar'[Date]))
+			VAR yearnow = [#TotalSales]
+			RETURN DIVIDE(yearnow-lastyear,lastyear,0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: 31e0b312-f065-4c71-bf4d-f742f8cbc5e6
+
+	measure Img_IconGoal =
+			
+			SWITCH(TRUE(),
+			    [#%Goal]>=0.95 && SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ArribaLight.png",
+			     [#%Goal]>=0.95 && SELECTEDVALUE(Mode[Activo])=1,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ArribaDark.png",
+			    [#%Goal]>=0.85 && SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/FlechaLight.png",
+			    [#%Goal]>=0.85 && SELECTEDVALUE(Mode[Activo])=1,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/FlechaDark.png",
+			    [#%Goal]<0.85 && SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/AbajoLight.png",
+			    [#%Goal]<0.85 && SELECTEDVALUE(Mode[Activo])=1,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/AbajoDark.png")
+		displayFolder: Images
+		lineageTag: 1501e743-900e-42aa-960a-2107e7fb63d0
+
+	measure #%TotalSalesSeller =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimSeller[Vendedor]))
+			RETURN DIVIDE([#TotalSales],sales,0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: a517863a-3d17-4443-bed5-afb60aaa1f3b
+
+	measure #AccuSales = TOTALYTD([#TotalSales],'Calendar'[Date])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: 748512ad-1146-4e05-948e-e80db04d7fc1
+
+	measure #%TotalSalesCustomer =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimCustomer[Nombre]))
+			RETURN DIVIDE([#TotalSales],sales,0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: 4c8f6de5-c949-4a26-83ab-6542d75c7330
+
+	measure #%ActiveCustomers = ```
+			
+				VAR referencedate = LASTDATE(ALL(FactSales[Fecha]))
+				VAR startdate = referencedate - 90
+				VAR result = CALCULATE(
+					DISTINCTCOUNT(FactSales[Id_Cliente]),
+					FactSales[Fecha] >= startdate
+				)
+				VAR customers = DISTINCTCOUNT(FactSales[Id_Cliente])
+			
+			
+				RETURN
+					DIVIDE(result,customers,0)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: e7c57dfe-ad22-4421-9f18-911f921ac9da
+
+	measure #CustomersPortfolio =
+			
+			VAR ReferenceDate = LASTDATE(ALL(FactSales[Fecha]))
+			VAR StartDate = ReferenceDate-90
+			VAR Customers = CALCULATE(DISTINCTCOUNT(FactSales[Id_Cliente]),FactSales[Fecha]<StartDate)
+			RETURN Customers
+		formatString: 0
+		displayFolder: KPIs
+		lineageTag: b7ce3810-c6d2-43f1-acb5-49fdbb51430e
+
+	measure #NewCustomers =
+			
+			VAR ReferenceDate = LASTDATE(ALL(FactSales[Fecha]))
+			VAR Stardate = ReferenceDate-90
+			VAR tbtlongtimecustomers = CALCULATETABLE(VALUES(FactSales[Id_Cliente]),FactSales[Fecha]<Stardate)
+			VAR tbtactivecustomers = CALCULATETABLE(VALUES(FactSales[Id_Cliente]),FactSales[Fecha]>=Stardate)
+			VAR tbtnewcustomers = COUNTROWS(EXCEPT(tbtactivecustomers,tbtlongtimecustomers))
+			RETURN tbtnewcustomers
+		formatString: 0
+		displayFolder: KPIs
+		lineageTag: 692526e1-0d74-4ccf-bb53-a089d6f2fea8
+
+	measure CardClientesAntiguos_Nuevos = ```
+			
+			VAR bg = MAXX(Mode,Mode[BgVisual])
+			var _textsec = MAXX(Mode,Mode[TextoPrincipal])
+			VAR _textmain = IF(SELECTEDVALUE(Mode[Activo])=0,MAXX(Mode,Mode[TextoPrincipal]),"#00ffcc")
+			VAR bordecard = IF(SELECTEDVALUE(Mode[Activo])=0,_textsec,bg)
+			VAR CustomerPortfolioLogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClientesAntiguosLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClientesAntiguosDark.png")
+			VAR NewCustomerLogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClienteNuevoLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClienteNuevoDark.png")
+			
+			VAR CustomerPortfolio = [#CustomersPortfolio]
+			VAR NewCustomers = [#NewCustomers]
+			VAR textfront = "Customer portfolio"
+			VAR textback = "New Customers"
+			
+			RETURN
+			"
+			<head>
+			 <style>
+			.card {
+			  width: 230px;
+			  height: 280px;
+			  perspective: 1000px;
+			}
+			
+			.card-inner {
+			  width: 100%;
+			  height: 100%;
+			  position: relative;
+			  transform-style: preserve-3d;
+			  transition: transform 0.999s;
+			}
+			
+			.card:hover .card-inner {
+			  transform: rotateY(180deg);
+			}
+			
+			.card-front,
+			.card-back {
+			  position: absolute;
+			  width: 100%;
+			  height: 100%;
+			  backface-visibility: hidden;
+			  display: flex;
+			  flex-direction: column;
+			}
+			
+			.card-front {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(0deg);
+			}
+			
+			.card-back {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(180deg);
+			}
+			
+			p {
+			  font-size: 0.8rem;
+			  display: flex;
+			  flex-direction: row;
+			  justify-content: center;
+			  align-items: center;
+			  gap: 5px;
+			  color: "&_textsec&";
+			}
+			
+			h3 {
+			  color:"&_textmain&";
+			  font-weight: bold;
+			}
+			
+			
+			 </style>   
+			</head>
+			<div class='card'>
+			  <div class='card-inner'>
+			    <div class='card-front'>
+			      <h3>"&CustomerPortfolio&"</h3>
+			      <p><img src='"&CustomerPortfolioLogo&"' width='26px'>"&textfront&"</p>
+			    </div>
+			    <div class='card-back'>
+			      <h3>"&NewCustomers&"</h3>
+			      <p><img src='"&NewCustomerLogo&"' width='26px'>"&textback&"</p>
+			    </div>
+			  </div>
+			</div>
+			"
+			```
+		displayFolder: VisualesHTML
+		lineageTag: e2158f63-b566-478e-b422-01adb9aa2061
+
+	measure #InactiveCustomers = ```
+			
+				VAR referencedate = LASTDATE(ALL(FactSales[Fecha]))
+				VAR startdate = referencedate - 90
+				VAR result = CALCULATE(
+					DISTINCTCOUNT(FactSales[Id_Cliente]),
+					FactSales[Fecha] >= startdate
+				)
+				VAR customers = DISTINCTCOUNT(FactSales[Id_Cliente])
+			
+			
+				RETURN customers-result
+			```
+		formatString: 0
+		displayFolder: KPIs
+		lineageTag: 997419ed-0a39-4957-9bf1-69a1b1421ced
+
+	measure CardClientesInactivos_%Activos = ```
+			
+			VAR bg = MAXX(Mode,Mode[BgVisual])
+			var _textsec = MAXX(Mode,Mode[TextoPrincipal])
+			VAR _textmain = IF(SELECTEDVALUE(Mode[Activo])=0,MAXX(Mode,Mode[TextoPrincipal]),"#00ffcc")
+			VAR bordecard = IF(SELECTEDVALUE(Mode[Activo])=0,_textsec,bg)
+			VAR CustomerActivoLogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClientesActivosLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClientesActivosDark.png")
+			VAR CustomerInactivoLogo = IF(SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClientesInactivosLight.png","https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ClientesInactivosDark.png")
+			
+			VAR _ClientesActivos = FORMAT([#%ActiveCustomers],"0.00%","En-Us")
+			VAR _CLientesInactivos = [#InactiveCustomers]
+			VAR textfront = "Active Customer (%)"
+			VAR textback = "Inactive Customer"
+			
+			RETURN
+			"
+			<head>
+			 <style>
+			.card {
+			  width: 230px;
+			  height: 280px;
+			  perspective: 1000px;
+			}
+			
+			.card-inner {
+			  width: 100%;
+			  height: 100%;
+			  position: relative;
+			  transform-style: preserve-3d;
+			  transition: transform 0.999s;
+			}
+			
+			.card:hover .card-inner {
+			  transform: rotateY(180deg);
+			}
+			
+			.card-front,
+			.card-back {
+			  position: absolute;
+			  width: 100%;
+			  height: 100%;
+			  backface-visibility: hidden;
+			  display: flex;
+			  flex-direction: column;
+			}
+			
+			.card-front {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(0deg);
+			}
+			
+			.card-back {
+			  background-color: "&bg&";
+			  color: #fff;
+			  display: flex;
+			  align-items: center;
+			  border: 1px solid "&bordecard&";
+			  border-radius: 10px;
+			  justify-content: center;
+			  transform: rotateY(180deg);
+			}
+			
+			p {
+			  font-size: 0.8rem;
+			  display: flex;
+			  flex-direction: row;
+			  justify-content: center;
+			  align-items: center;
+			  gap: 5px;
+			  color: "&_textsec&";
+			}
+			
+			h3 {
+			  color:"&_textmain&";
+			  font-weight: bold;
+			}
+			
+			
+			 </style>   
+			</head>
+			<div class='card'>
+			  <div class='card-inner'>
+			    <div class='card-front'>
+			      <h3>"&_ClientesActivos&"</h3>
+			      <p><img src='"&CustomerActivoLogo&"' width='26px'>"&textfront&"</p>
+			    </div>
+			    <div class='card-back'>
+			      <h3>"&_CLientesInactivos&"</h3>
+			      <p><img src='"&CustomerInactivoLogo&"' width='26px'>"&textback&"</p>
+			    </div>
+			  </div>
+			</div>
+			"
+			```
+		displayFolder: VisualesHTML
+		lineageTag: bba97662-0fda-43db-a5e2-d3330c8e75b8
+
+	measure #PurchaseFrequency =
+			
+			DIVIDE(DISTINCTCOUNT(FactSales[Id_transaccion]),DISTINCTCOUNT(FactSales[Id_Cliente]),0)
+		displayFolder: KPIs
+		lineageTag: 0efe3875-a531-4098-bdff-cec1aa38a580
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure #Transactions =
+			
+			COALESCE(DISTINCTCOUNT(FactSales[Id_transaccion]),0)
+		formatString: 0
+		displayFolder: KPIs
+		lineageTag: 14effd9b-204a-4378-b615-3894b1c5fca0
+
+	measure #UnitsPerTransaction = DIVIDE([#Units],[#Transactions],0)
+		displayFolder: KPIs
+		lineageTag: c2c75757-08ae-4cb8-9ab7-4c10025a887d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure #%TotalSalesProducts =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimProducts[Producto]))
+			RETURN DIVIDE([#TotalSales],sales,0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: 06ee6828-3ba8-417f-b155-c8064b6a9184
+
+	measure #%GoalNotFilter =
+			
+			VAR _sales = CALCULATE([#TotalSales],ALL(DimSeller[Vendedor]))
+			VAR _budget = CALCULATE([#TotalBudget],ALL(DimSeller[Vendedor]))
+			VAR _goal = DIVIDE(_sales,_budget,0)
+			VAR _result = IF(_goal>1,1,_goal)
+			RETURN _result
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: fa306741-2cac-40b2-b5d2-eca0cd703c8b
+
+	measure #%TotalSaleAll = ```
+			
+			VAR _customer = HASONEVALUE(DimCustomer[Nombre])
+			VAR _seller = HASONEVALUE(DimSeller[Vendedor])
+			VAR _branch = HASONEVALUE(DimBranch[Tienda])
+			
+			RETURN 
+			    SWITCH(TRUE(),
+			        _customer,[#%TotalSalesCustomer],
+			        _seller,[#%TotalSalesSeller],
+			        _branch,[#%TotalSalesBranch])
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: 664d0165-4925-498c-8c64-31afda53b7d9
+
+	measure FilterBranchSeller =
+			
+			COUNT(FactSales[Id_Vendedor])
+		formatString: 0
+		displayFolder: Others
+		lineageTag: 203bc917-3310-4f65-a3ca-f6f1dbeb0353
+
+	measure Img_IconGoal2 =
+			
+			SWITCH(TRUE(),
+			    [#%GoalNotFilter]>=0.95 && SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ArribaLight.png",
+			     [#%GoalNotFilter]>=0.95 && SELECTEDVALUE(Mode[Activo])=1,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/ArribaDark.png",
+			    [#%GoalNotFilter]>=0.85 && SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/FlechaLight.png",
+			    [#%GoalNotFilter]>=0.85 && SELECTEDVALUE(Mode[Activo])=1,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/FlechaDark.png",
+			    [#%GoalNotFilter]<0.85 && SELECTEDVALUE(Mode[Activo])=0,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/AbajoLight.png",
+			    [#%GoalNotFilter]<0.85 && SELECTEDVALUE(Mode[Activo])=1,"https://raw.githubusercontent.com/Gbarrantes25/Supermarket-Sales-Dashboard/refs/heads/main/Images/AbajoDark.png")
+		displayFolder: Images
+		lineageTag: c5300e3e-423f-44cf-8f5a-ff24ffa4c449
+
+	measure #AccuRankCategory =
+			
+			VAR tbt = ADDCOLUMNS(ALL(DimProducts[Categoria]),"Total",[#TotalSales],"Rank",RANKX(ALL(DimProducts[Categoria]),[#TotalSales],,DESC))
+			VAR ranknow = RANKX(ALL(DimProducts[Categoria]),[#TotalSales],,DESC)
+			RETURN
+			    SUMX(
+			        FILTER(tbt,[Rank]<=ranknow),[#TotalSales])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: 51a1f74b-18dc-4bd4-acb9-9c5777af1cc3
+
+	measure #%AccuRankCategory =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimProducts[Categoria]))
+			RETURN DIVIDE([#AccuRankCategory],sales,0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: c1a1af7e-25cb-4e41-ae42-d66fee5fb08d
+
+	measure #AccuRankProduct =
+			
+			VAR tbt = ADDCOLUMNS(ALL(DimProducts[Producto]),"Total",[#TotalSales],"Rank",RANKX(ALL(DimProducts[Producto]),[#TotalSales],,DESC))
+			VAR ranknow = RANKX(ALL(DimProducts[Producto]),[#TotalSales],,DESC)
+			RETURN
+			    SUMX(
+			        FILTER(tbt,[Rank]<=ranknow),[#TotalSales])
+		displayFolder: KPIs
+		lineageTag: 6412745e-f5b3-40c3-a0cd-158978de4132
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure #%AccuRankProduct =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimProducts[Producto]))
+			RETURN DIVIDE([#AccuRankProduct],sales,0)
+		displayFolder: KPIs
+		lineageTag: b5eea3fe-a83f-4516-9139-1fb174cc70cd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure #AverageUnitPrice = AVERAGEX(DimProducts,DimProducts[Precio_Unit])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: ae68b73d-ef6a-4fb2-9492-f4358e4bcecd
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-US"}
+
+	measure #TotalSalesPreviusMonth = CALCULATE([#TotalSales],DATEADD('Calendar'[Date],-1,MONTH))
+		displayFolder: KPIs
+		lineageTag: ece5c030-84dd-455b-8e6e-7c5c6a347aa4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure #MoMSales = [#TotalSales]-[#TotalSalesPreviusMonth]
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: KPIs
+		lineageTag: d31755e0-96b4-4752-98ee-8ae66972ca83
+
+	measure DiffSalesMonthFormat =
+			
+			Fx_FormatNumberUSD([#MoMSales])
+		displayFolder: KPIs_Format
+		lineageTag: bd76ae05-7e9f-41ff-aa64-01d5c38a9cf8
+
+	measure #%MoM =
+			
+			VAR _value = DIVIDE([#TotalSales],[#TotalSalesPreviusMonth],0)-1
+			RETURN IF(_value>=0,"▲"& FORMAT(_value,"#0.00%","En-US"),"▼"&FORMAT(_value,"#0.00%","En-Us"))
+		displayFolder: KPIs
+		lineageTag: 1b281b5e-45fd-451e-b3bf-b7fa9877f97e
+
+	measure #%TotalSalesCategory =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimProducts[Categoria]))
+			RETURN DIVIDE([#TotalSales],sales,0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: KPIs
+		lineageTag: 1f5b9d42-c16e-43c9-8d60-45569974d56d
+
+	measure #%TotalSalesBranch =
+			
+			VAR sales = CALCULATE([#TotalSales],ALL(DimBranch[Tienda]))
+			RETURN DIVIDE([#TotalSales],sales,0)
+		displayFolder: KPIs
+		lineageTag: 62e01ad8-142e-4b90-bb87-8cf09546a56f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Measure = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", type text}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Columna1"})
+				in
+				    #"Columnas quitadas"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

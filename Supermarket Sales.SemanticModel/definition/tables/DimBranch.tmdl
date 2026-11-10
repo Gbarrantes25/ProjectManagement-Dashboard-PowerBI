@@ -1,0 +1,43 @@
+table DimBranch
+	lineageTag: 338cb158-ce04-494b-870d-75d6d6db780c
+
+	column Id_Tienda
+		dataType: int64
+		formatString: 0
+		lineageTag: 68412069-a8c0-4d9a-a574-f8574bd72ffa
+		summarizeBy: none
+		sourceColumn: Id_Tienda
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tienda
+		dataType: string
+		lineageTag: 794a4526-8d02-4a8c-b9c9-23d7348cd5b5
+		summarizeBy: none
+		sourceColumn: Tienda
+		sortByColumn: Id_Tienda
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ubicacion
+		dataType: string
+		lineageTag: 79e7739f-1e29-494a-836d-525344988ca9
+		summarizeBy: none
+		sourceColumn: Ubicacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimBranch = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("ep-muddy-field-awq13mvt-pooler.c-12.us-east-1.aws.neon.tech", "neondb", [Query="SELECT * FROM ""DimBranch"""])
+				in
+				    Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

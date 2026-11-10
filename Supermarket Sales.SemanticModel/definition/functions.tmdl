@@ -1,0 +1,42 @@
+function Fx_FormatNumber =
+		(_Measure: expr ) =>
+				VAR _value = _Measure
+				RETURN
+					SWITCH(
+						TRUE(),
+						_value >= 1000000 || _value <= -1000000, FORMAT(
+							_value,
+							"#,0,,.00 M"
+						),
+						_value >= 1000 || _value <= -1000, FORMAT(
+							_value,
+							"#,0,.00 K"
+						),
+						FORMAT(
+							_value,
+							"#,0"
+						)
+					)
+	lineageTag: 3f73568a-7144-4c9e-b78a-e796ad7393c4
+
+function Fx_FormatNumberUSD =
+		(_Measure: expr ) =>
+				VAR _value = _Measure
+				RETURN
+					SWITCH(
+						TRUE(),
+						_value >= 1000000 || _value <= -1000000, FORMAT(
+							_value,
+							"$#,0,,.00 M"
+						),
+						_value >= 1000 || _value <= -1000, FORMAT(
+							_value,
+							"$#,0,.00 K"
+						),
+						FORMAT(
+							_value,
+							"$#,0"
+						)
+					)
+	lineageTag: f74ba458-e83a-4843-8318-2945063b1b42
+

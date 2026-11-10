@@ -1,0 +1,115 @@
+table Calendar
+	lineageTag: 1f54c9b6-0b75-40f4-809c-6de0b9ee4f4f
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: d/mm/yy
+		lineageTag: 8287eee5-96c4-47d1-86d4-c41cb8393892
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column #Año
+		formatString: 0
+		lineageTag: eea30b92-7224-4108-a891-2bcbe7dda7cd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Año]
+
+		annotation SummarizationSetBy = User
+
+	column #Quarter
+		formatString: 0
+		lineageTag: 0a2fb60d-8b8f-4850-b620-b74e4a1bf554
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Quarter]
+
+		annotation SummarizationSetBy = User
+
+	column #Mes
+		formatString: 0
+		lineageTag: 4e4618f6-f3df-4aff-85f2-a6cd5a8c6ce2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Mes]
+
+		annotation SummarizationSetBy = User
+
+	column Mes
+		lineageTag: 66b7a4bc-7d3b-4ee2-8b0b-959afd7812a4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mes]
+		sortByColumn: #Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column #Día
+		formatString: 0
+		lineageTag: 6f2dc996-ad89-48ed-a1f1-ef16119347c0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Día]
+
+		annotation SummarizationSetBy = User
+
+	column DiaSem
+		lineageTag: d6db743f-f464-4855-8408-05ce0dbb743d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DiaSem]
+		sortByColumn: #DiaSem
+
+		annotation SummarizationSetBy = Automatic
+
+	column #DiaSem
+		formatString: 0
+		lineageTag: 346fe087-7fcb-4cbf-a92a-c086c1b7ea95
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#DiaSem]
+
+		annotation SummarizationSetBy = User
+
+	column #Sem
+		formatString: 0
+		lineageTag: 6a888ea3-93cc-4d73-8c31-4175a490cd8e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Sem]
+
+		annotation SummarizationSetBy = User
+
+	hierarchy '#Año Jerarquía'
+		lineageTag: 29ec06bd-fccb-40aa-8335-87ca44bca2d4
+
+		level #Año
+			lineageTag: c6a2d979-ed5a-48d1-97d3-d57e01aa6c14
+			column: #Año
+
+		level #Quarter
+			lineageTag: e796407f-fda5-406b-852d-71be29506742
+			column: #Quarter
+
+		level #Mes
+			lineageTag: b444f700-a07b-4412-9805-72b4b40aa6dc
+			column: #Mes
+
+		level Mes
+			lineageTag: 02664ab4-0183-4bb8-a76a-58daac5bfd54
+			column: Mes
+
+	partition Calendar = calculated
+		mode: import
+		source = ADDCOLUMNS(CALENDAR(FIRSTDATE(FactSales[Fecha]),LASTDATE(FactSales[Fecha])),"#Año",YEAR([Date]),"#Quarter",QUARTER([Date]),"#Mes",MONTH([Date]),"Mes",FORMAT([Date],"MMM"),"#Día",DAY([Date]),"#Sem",WEEKNUM([Date],1),"DiaSem",FORMAT([Date],"DDD","En-Us"),"#DiaSem",WEEKDAY([Date],2))
+
+	annotation PBI_Id = 1152c1b7ed5d4863b62b0fdd359ae488
+

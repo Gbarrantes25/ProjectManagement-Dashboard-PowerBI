@@ -1,0 +1,74 @@
+table Mode
+	lineageTag: 28bbc564-6201-41af-b879-0dee1790c6e4
+
+	column Modo
+		dataType: string
+		lineageTag: 160271c3-d865-4d82-83f4-79265524361c
+		summarizeBy: none
+		sourceColumn: Modo
+
+		annotation SummarizationSetBy = Automatic
+
+	column URL
+		dataType: string
+		lineageTag: 96c423c4-d82c-4238-ae4a-5669d18872ef
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: URL
+
+		annotation SummarizationSetBy = Automatic
+
+	column Activo =
+			
+			IF(Mode[Modo]="Dark",1,0)
+		formatString: 0
+		lineageTag: 7d4b4bf4-d214-4ef1-b28b-47e43ebf6982
+		summarizeBy: none
+
+		annotation SummarizationSetBy = User
+
+	column BgPrinicpal
+		dataType: string
+		lineageTag: 1c378578-d129-4a02-a678-7d66250d8408
+		summarizeBy: none
+		sourceColumn: BgPrinicpal
+
+		annotation SummarizationSetBy = Automatic
+
+	column BgVisual
+		dataType: string
+		lineageTag: 03217556-fd0d-4057-bdb7-ed44bd531f59
+		summarizeBy: none
+		sourceColumn: BgVisual
+
+		annotation SummarizationSetBy = Automatic
+
+	column TextosSec
+		dataType: string
+		lineageTag: dc849534-b97b-4571-a1ec-7300831f98e3
+		summarizeBy: none
+		sourceColumn: TextosSec
+
+		annotation SummarizationSetBy = Automatic
+
+	column TextoPrincipal
+		dataType: string
+		lineageTag: 881199d6-f0ee-4e02-a882-b340279f2278
+		summarizeBy: none
+		sourceColumn: TextoPrincipal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Mode = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("vY5BDoIwEEXvUrfAtBoMujMQjImuWBIWQztQogXSlnh9oStO4F/9+cnkvbpmBdo3i5j2fnZXAIvfpB+8XtrFkZXT6Gn0iZwM3Fu0FtfbHVOolpmsWV/JxxV+yMUFOt1OaBVY6hxoQuXA4DDCw2BPDjbQa1KUzGO/Ag8857kotpbxLMXz1gQJOnVb60JYE9XsOfTa/0UxkPaOZVZeyluwlVwKFbaQ3dY0Pw==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Modo = _t, URL = _t, BgPrinicpal = _t, TextosSec = _t, BgVisual = _t, TextoPrincipal = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Modo", type text}, {"URL", type text}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

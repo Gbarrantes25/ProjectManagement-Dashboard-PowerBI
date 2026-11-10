@@ -1,0 +1,26 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-PE
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["FactSales","DimProducts","DimBranch","DimCustomer","DimSeller","FactSalesVsPPTO","Measure","Mode"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+ref table FactSales
+ref table DimProducts
+ref table DimBranch
+ref table DimCustomer
+ref table DimSeller
+ref table FactSalesVsPPTO
+ref table Calendar
+ref table Measure
+ref table Mode
+
+ref cultureInfo es-ES
+

@@ -1,0 +1,101 @@
+table FactSales
+	lineageTag: 25b3ff60-dc1c-40db-a48c-75e01b90a1fb
+
+	column Id_transaccion
+		dataType: int64
+		formatString: 0
+		lineageTag: 378620c9-902b-44e0-befa-7d8e7d65ae7a
+		summarizeBy: none
+		sourceColumn: Id_transaccion
+
+		annotation SummarizationSetBy = User
+
+	column Fecha
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: d4914a1e-e9a9-4e14-a213-8be7bce9523c
+		summarizeBy: none
+		sourceColumn: Fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Id_Producto
+		dataType: int64
+		formatString: 0
+		lineageTag: 8112ac14-2ff9-438b-ba0d-fef6c2623278
+		summarizeBy: none
+		sourceColumn: Id_Producto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Id_Cliente
+		dataType: int64
+		formatString: 0
+		lineageTag: fbfd8e90-69e0-40cb-a2ff-51406e0c44be
+		summarizeBy: none
+		sourceColumn: Id_Cliente
+
+		annotation SummarizationSetBy = User
+
+	column Id_Tienda
+		dataType: int64
+		formatString: 0
+		lineageTag: fc52406b-fe0c-4382-aa88-8498b7d0ef46
+		summarizeBy: none
+		sourceColumn: Id_Tienda
+
+		annotation SummarizationSetBy = User
+
+	column Id_Vendedor
+		dataType: int64
+		formatString: 0
+		lineageTag: 5176bf28-a632-4490-87d9-167385850645
+		summarizeBy: none
+		sourceColumn: Id_Vendedor
+
+		annotation SummarizationSetBy = User
+
+	column Cantidad
+		dataType: int64
+		formatString: 0
+		lineageTag: fb67591d-0da4-486a-af23-8e9ca77600bd
+		summarizeBy: none
+		sourceColumn: Cantidad
+
+		annotation SummarizationSetBy = User
+
+	column Total
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 2ea1821e-9cfb-4596-8b02-3ef084752c4f
+		summarizeBy: none
+		sourceColumn: Total
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Id
+		dataType: int64
+		formatString: 0
+		lineageTag: 033a5326-b76d-4df1-b5d1-fcda87ec8934
+		summarizeBy: count
+		sourceColumn: Id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactSales = m
+		mode: import
+		source =
+				let
+				    // Reemplaza "tu-host-neon.tech" y "neondb" con tus datos reales
+				    Origen = PostgreSQL.Database("ep-muddy-field-awq13mvt-pooler.c-12.us-east-1.aws.neon.tech", "neondb", [Query="SELECT * FROM ""FactSales"""])
+				in
+				    Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

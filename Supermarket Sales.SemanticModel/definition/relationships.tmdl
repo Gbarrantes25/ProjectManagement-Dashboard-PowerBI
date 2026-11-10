@@ -1,0 +1,24 @@
+relationship AutoDetected_720611af-d69d-48bc-b959-dc9e4775b7b6
+	fromColumn: FactSales.Id_Producto
+	toColumn: DimProducts.Id_Producto
+
+relationship AutoDetected_03d225e3-bf1d-4958-bcbe-14b43393561d
+	fromColumn: FactSales.Id_Cliente
+	toColumn: DimCustomer.Id_Cliente
+
+relationship AutoDetected_bc92062d-622b-423d-868c-7b6cd6edd876
+	fromColumn: FactSales.Id_Tienda
+	toColumn: DimBranch.Id_Tienda
+
+relationship AutoDetected_e50658c5-2d08-4fa8-b959-8a9af3615129
+	fromColumn: FactSales.Id_Vendedor
+	toColumn: DimSeller.Id_Vendedor
+
+relationship b6c95723-910b-2c73-cd5c-7d8c8850b764
+	fromColumn: FactSales.Fecha
+	toColumn: Calendar.Date
+
+relationship bfe6c86f-18af-13df-74c2-8aaf1530c469
+	fromColumn: FactSalesVsPPTO.FechaPPTO
+	toColumn: Calendar.Date
+
