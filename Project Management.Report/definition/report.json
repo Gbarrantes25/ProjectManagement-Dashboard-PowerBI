@@ -1,0 +1,105 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY26SU02",
+      "reportVersionAtImport": {
+        "visual": "2.6.0",
+        "report": "3.1.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "Gantt1448688115699",
+    "p6GanttChartVisual23D4F5A6B7C8D9E0F1A2B3C4D5E6F7A8",
+    "powerGANTTchart76BDD9F52FA14ADEB68823A07759D182"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU02",
+          "path": "BaseThemes/CY26SU02.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "icons8-gesti_n-de-proyectos-50021095384058863353.png",
+          "path": "icons8-gesti_n-de-proyectos-50021095384058863353.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-gr_fico-combinado-507218073285988532.png",
+          "path": "icons8-gr_fico-combinado-507218073285988532.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-l_nea-de-tiempo-semana-020645764236143394.png",
+          "path": "icons8-l_nea-de-tiempo-semana-020645764236143394.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-lista-de-verificaci_n-58782591039350021.png",
+          "path": "icons8-lista-de-verificaci_n-58782591039350021.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-ver-archivo-648086763649122943.png",
+          "path": "icons8-ver-archivo-648086763649122943.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-vista-general-2-509360254495365716.png",
+          "path": "icons8-vista-general-2-509360254495365716.png",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

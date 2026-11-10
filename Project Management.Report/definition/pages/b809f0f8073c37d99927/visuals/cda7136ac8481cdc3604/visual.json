@@ -1,0 +1,775 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.6.0/schema.json",
+  "name": "cda7136ac8481cdc3604",
+  "position": {
+    "x": 94.801454217512614,
+    "y": 324.66251444353634,
+    "z": 5000,
+    "height": 375.309866696728,
+    "width": 610.36552715384835,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimProjects"
+                    }
+                  },
+                  "Property": "project_name"
+                }
+              },
+              "queryRef": "DimProjects.project_name",
+              "nativeQueryRef": "Project",
+              "displayName": "Project"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "Measure.Status",
+              "nativeQueryRef": "Status"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "#CPI"
+                }
+              },
+              "queryRef": "Measure.#CPI_Project",
+              "nativeQueryRef": "CPI",
+              "displayName": "CPI"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "#SPI"
+                }
+              },
+              "queryRef": "Measure.#SPI_Project",
+              "nativeQueryRef": "SPI",
+              "displayName": "SPI"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "#Executed_Budget"
+                }
+              },
+              "queryRef": "Measure.#Executed_Budget",
+              "nativeQueryRef": "Executed(%)",
+              "displayName": "Executed(%)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Measure"
+                    }
+                  },
+                  "Property": "Status_Alert"
+                }
+              },
+              "queryRef": "Measure.Status_Alert",
+              "nativeQueryRef": "Alert",
+              "displayName": "Alert"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimProjects"
+                  }
+                },
+                "Property": "project_name"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {},
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "DimProjects.project_name"
+          }
+        },
+        {
+          "properties": {
+            "icon": {
+              "kind": "Icon",
+              "layout": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Before'"
+                  }
+                }
+              },
+              "verticalAlignment": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Top'"
+                  }
+                }
+              },
+              "value": {
+                "expr": {
+                  "Conditional": {
+                    "Cases": [
+                      {
+                        "Condition": {
+                          "And": {
+                            "Left": {
+                              "Comparison": {
+                                "ComparisonKind": 1,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#CPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "1D"
+                                  }
+                                }
+                              }
+                            },
+                            "Right": {
+                              "Comparison": {
+                                "ComparisonKind": 4,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#CPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "1e+23D"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "Literal": {
+                            "Value": "'TrafficHigh'"
+                          }
+                        }
+                      },
+                      {
+                        "Condition": {
+                          "Comparison": {
+                            "ComparisonKind": 0,
+                            "Left": {
+                              "Measure": {
+                                "Expression": {
+                                  "SourceRef": {
+                                    "Entity": "Measure"
+                                  }
+                                },
+                                "Property": "#CPI"
+                              }
+                            },
+                            "Right": {
+                              "Literal": {
+                                "Value": "1D"
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "Literal": {
+                            "Value": "'TrafficMedium'"
+                          }
+                        }
+                      },
+                      {
+                        "Condition": {
+                          "And": {
+                            "Left": {
+                              "Comparison": {
+                                "ComparisonKind": 1,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#CPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "-1e+27D"
+                                  }
+                                }
+                              }
+                            },
+                            "Right": {
+                              "Comparison": {
+                                "ComparisonKind": 3,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#CPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "1D"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "Literal": {
+                            "Value": "'TrafficLow'"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Measure.#CPI_Project"
+          }
+        },
+        {
+          "properties": {
+            "icon": {
+              "kind": "Icon",
+              "layout": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Before'"
+                  }
+                }
+              },
+              "verticalAlignment": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Top'"
+                  }
+                }
+              },
+              "value": {
+                "expr": {
+                  "Conditional": {
+                    "Cases": [
+                      {
+                        "Condition": {
+                          "And": {
+                            "Left": {
+                              "Comparison": {
+                                "ComparisonKind": 1,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#SPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "1D"
+                                  }
+                                }
+                              }
+                            },
+                            "Right": {
+                              "Comparison": {
+                                "ComparisonKind": 3,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#SPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "1e+26D"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "Literal": {
+                            "Value": "'TrafficHigh'"
+                          }
+                        }
+                      },
+                      {
+                        "Condition": {
+                          "Comparison": {
+                            "ComparisonKind": 0,
+                            "Left": {
+                              "Measure": {
+                                "Expression": {
+                                  "SourceRef": {
+                                    "Entity": "Measure"
+                                  }
+                                },
+                                "Property": "#SPI"
+                              }
+                            },
+                            "Right": {
+                              "Literal": {
+                                "Value": "1D"
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "Literal": {
+                            "Value": "'TrafficMedium'"
+                          }
+                        }
+                      },
+                      {
+                        "Condition": {
+                          "And": {
+                            "Left": {
+                              "Comparison": {
+                                "ComparisonKind": 1,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#SPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "-1e+29D"
+                                  }
+                                }
+                              }
+                            },
+                            "Right": {
+                              "Comparison": {
+                                "ComparisonKind": 3,
+                                "Left": {
+                                  "Measure": {
+                                    "Expression": {
+                                      "SourceRef": {
+                                        "Entity": "Measure"
+                                      }
+                                    },
+                                    "Property": "#SPI"
+                                  }
+                                },
+                                "Right": {
+                                  "Literal": {
+                                    "Value": "1D"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "Value": {
+                          "Literal": {
+                            "Value": "'TrafficLow'"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Measure.#SPI_Project"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "Measure"
+                                    }
+                                  },
+                                  "Property": "Status_Alert"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "'At Risk'"
+                                }
+                              }
+                            },
+                            "Annotations": {
+                              "PowerBI.SQExprEvaluationKind": 1,
+                              "PowerBI.SQExprTextOperatorOption": 2
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#D64550'"
+                            }
+                          }
+                        },
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "Measure"
+                                    }
+                                  },
+                                  "Property": "Status_Alert"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "'Critical'"
+                                }
+                              }
+                            },
+                            "Annotations": {
+                              "PowerBI.SQExprEvaluationKind": 1,
+                              "PowerBI.SQExprTextOperatorOption": 2
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#D64550'"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Measure.Status_Alert"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Center'"
+                }
+              }
+            },
+            "autoSizeColumnWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "columnAdjustment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'fitToContent'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": -0.6
+                    }
+                  }
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Outer'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "30D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": -0.3
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Status per Project'"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI'', wf_segoe-ui_normal, helvetica, arial, sans-serif'"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": -0.6
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stylePreset": [
+        {
+          "properties": {
+            "name": {
+              "expr": {
+                "Literal": {
+                  "Value": "'None'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

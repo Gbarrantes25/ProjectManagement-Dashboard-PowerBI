@@ -1,0 +1,87 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.6.0/schema.json",
+  "name": "412af3e060c3bc20b4a7",
+  "position": {
+    "x": 23.375701039934619,
+    "y": 403.7410311363891,
+    "z": 7000,
+    "height": 35.063551559901924,
+    "width": 35.063551559901924,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "image",
+    "objects": {
+      "image": [
+        {
+          "properties": {
+            "sourceFile": {
+              "image": {
+                "name": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'icons8-lista-de-verificación-50.png'"
+                    }
+                  }
+                },
+                "url": {
+                  "expr": {
+                    "ResourcePackageItem": {
+                      "PackageName": "RegisteredResources",
+                      "PackageType": 1,
+                      "ItemName": "icons8-lista-de-verificaci_n-58782591039350021.png"
+                    }
+                  }
+                },
+                "scaling": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'Normal'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "visualLink": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "tooltip": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Task Status'"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'PageNavigation'"
+                }
+              }
+            },
+            "navigationSection": {
+              "expr": {
+                "Literal": {
+                  "Value": "'b27eb179904699e7ab80'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
