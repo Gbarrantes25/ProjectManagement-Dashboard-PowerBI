@@ -179,7 +179,7 @@ SELECT DISTINCT project_management_id, project_management
 FROM projects 
 ORDER BY project_management_id
 ```
-
+</details>
 <details>
 <summary>🔄 DimPhase (Dimensión de fases)</summary>
 
@@ -229,17 +229,382 @@ FROM projects
 
 ## 📂 Estructura del Repositorio
 
-```code
+```
 .
-├── Data Source/                    # Contiene datos fuente
-│   └── projects.csv               # Archivo CSV con datos del proyecto
-├── Project Management.Report/     # Componentes del reporte (formato .pbip)
-├── Project Management.SemanticModel/  # Modelo semántico
-├── Project Management.pbip        # Proyecto Power BI (formato nuevo)
-├── Project Management.pbix        # Archivo ejecutable de Power BI
-├── .gitignore                     # Archivo de configuración Git
-└── README.md                      # Este archivo
+├── Data Source/                      # Contiene datos fuente
+│   └── projects.csv                  # Archivo CSV con datos del proyecto
+├── Project Management.Report/        # Componentes del reporte (formato .pbip)
+├── Project Management.SemanticModel/ # Modelo semántico
+├── Project Management.pbip           # Proyecto Power BI (formato nuevo)
+├── Project Management.pbix           # Archivo ejecutable de Power BI
+├── .gitignore                        # Archivo de configuración Git
+└── README.md                         # Este archivo
 ```
 
 ## 🧮 Medidas DAX Implementadas
-sadsa
+#### 📊 Basics (Métricas Básicas)
+
+<details>
+<summary>Ver medidas básicas</summary>
+
+
+#CountTask - Conteo de tareas únicas
+```dax
+=DISTINCTCOUNT(Fact_Task[task_id])
+```
+
+#ProjectsQuantity - Cantidad de proyectos
+
+
+```dax
+=DISTINCTCOUNT(Fact_Task[project_id])
+```
+
+#CountDone - Tareas completadas
+
+
+```dax
+=COUNTROWS(FILTER(
+    ADDCOLUMNS(
+        SUMMARIZE(Fact_Task, DimTask[task_id]),
+        "Status1", [Status]
+    ),[Status1]="Done")
+)
+```
+
+#CountInProgress - Tareas en progreso
+
+
+```dax
+=COUNTROWS(FILTER(
+    ADDCOLUMNS(
+        SUMMARIZE(Fact_Task, DimTask[task_id]),
+        "Status1", [Status]
+    ),[Status1]="In Progress")
+)
+```
+
+#CountToDo - Tareas pendientes
+
+
+```dax
+=COUNTROWS(FILTER(
+    ADDCOLUMNS(
+        SUMMARIZE(Fact_Task, DimTask[task_id]),
+        "Status1", [Status]
+    ),[Status1]="To Do")
+)
+```
+</details>
+
+#### 🔢 Calculations (Cálculos Financieros y de Valor)
+
+<details>
+<summary>Ver cálculos avanzados</summary>
+
+
+#AC - Actual Cost (Costo Real)
+```dax
+=SUM(Fact_Task[ac])
+```
+
+#BU - Budget (Presupuesto)
+
+```dax
+VAR _Result = SUMX(VALUES(Fact_Task[task_id]),CALCULATE(MAX(Fact_Task[budget])))
+RETURN _Result
+```
+
+#CV - Cost Variance (Variación de Costo)
+
+```dax
+=[#EV]-[#AC]
+```
+
+#EAC - Estimate At Completion (Estimación al Completar)
+
+```dax
+=IF(
+    ISBLANK([#CPI]) || [#CPI] = 0,
+    [#BU],
+    DIVIDE([#BU], [#CPI])
+)
+```
+
+#EV - Earned Value (Valor Ganado)
+
+```dax
+=[#BU]*[#Progress(%)]
+```
+
+#Executed_Budget - Presupuesto Ejecutado (%)
+
+```dax
+=DIVIDE([#AC],[#BU],0)
+```
+
+#Progress(%) - Progreso Ponderado
+
+```dax
+VAR _RealProgress = SUMX(VALUES(Fact_Task[task_id]),CALCULATE(MAX(Fact_Task[phase_weight])*CALCULATE(MAX(Fact_Task[progress_acc]))))
+VAR _TotalProgress = SUMX(VALUES(Fact_Task[task_id]),CALCULATE(MAX(Fact_Task[phase_weight])))
+RETURN DIVIDE(_RealProgress,_TotalProgress,0)
+```
+
+#PV - Planned Value (Valor Planificado)
+
+```dax
+VAR _MaxContextDate = TODAY()
+VAR _TotalDays = DATEDIFF(CALCULATE(MIN(Fact_Task[planned_startdate])),CALCULATE(MAX(Fact_Task[planned_enddate])),DAY)+1
+VAR _RealEnd = IF([#Progress(%)]=1,CALCULATE(MAX(Fact_Task[real_enddate])),BLANK())
+VAR _StatementDate = IF(ISBLANK(_RealEnd),_MaxContextDate,_RealEnd)
+VAR _ElapsedDays = MAX(0,DATEDIFF(CALCULATE(MIN(Fact_Task[planned_startdate])),_StatementDate,DAY)+1)
+VAR _ProgressPct = MIN(1,DIVIDE(_ElapsedDays,_TotalDays,0))
+RETURN _ProgressPct*[#BU]
+```
+
+#VAC - Variance At Completion (Variación al Completar)
+
+```dax
+=[#BU]-[#EAC]
+#CV(%) - Variación de Costo (%)
+dax
+=DIVIDE([#CV],[#EV],0)
+```
+</details>
+
+#### 📅 Dates (Fechas)
+<details>
+<summary>Ver medidas de fechas</summary>
+
+
+RealEndDate - Fecha de fin real
+
+```dax
+=IF([#Progress(%)] = 1,MAX(Fact_Task[real_enddate]),BLANK())
+```
+
+RealStartDate - Fecha de inicio real
+
+```dax
+=MIN(Fact_Task[real_startdate])
+```
+
+</details>
+
+#### 🚦 KPIs (Indicadores Clave de Rendimiento)
+<details>
+<summary>Ver KPIs</summary>
+
+
+#CPI - Cost Performance Index (Índice de Rendimiento de Costo)
+
+```dax
+VAR _CPI = 
+    IF(
+        ISBLANK([#AC]) || [#AC] = 0, 
+        BLANK(), 
+        DIVIDE([#EV], [#AC], BLANK())
+    )
+VAR _Result = IF(NOT(ISBLANK(_CPI)), MIN(_CPI, 3.00), BLANK())
+RETURN _Result
+```
+
+#SPI - Schedule Performance Index (Índice de Rendimiento de Cronograma)
+
+```dax
+VAR _PlannedEnd = MAX(Fact_Task[planned_enddate])
+VAR _Result = IF([Status] = "To Do" && [#EV] = 0 && _PlannedEnd>TODAY(), 
+                BLANK(), 
+                DIVIDE([#EV], [#PV],BLANK())
+            )
+RETURN _Result
+```
+
+</details>
+
+#### 🎯 Status (Estado y Alertas)
+<details>
+<summary>Ver medidas de estado</summary>
+
+
+Status - Estado de la tarea
+
+```dax
+VAR _Progress = [#Progress(%)]
+VAR _RealStart = MIN(Fact_Task[real_startdate])
+VAR _RealEnd = SWITCH(TRUE(),
+                _Progress = 1,FORMAT(MAX(Fact_Task[real_enddate]),"DD/MM/YYYY"),
+                _Progress < 1 = BLANK(),
+                BLANK())
+VAR _Result = SWITCH(TRUE(),
+                ISBLANK(_RealStart) && ISBLANK(_RealEnd),"To Do",
+                NOT(ISBLANK(_RealStart)) && ISBLANK(_RealEnd),"In Progress",
+                "Done")
+RETURN _Result
+```
+
+Status_Alert - Alerta de estado del proyecto
+
+```dax
+VAR _SPI = [#SPI]
+VAR _CPI = [#CPI]
+VAR _Result = SWITCH(TRUE(),
+                ISBLANK(_SPI) && ISBLANK(_CPI), "Not Started",
+                (NOT(ISBLANK(_CPI)) && _CPI<0.90) || (NOT(ISBLANK(_SPI)) && _SPI<0.90),"Critical",
+                (NOT(ISBLANK(_CPI)) && _CPI<1) || (NOT(ISBLANK(_SPI)) && _SPI<1),"At Risk",
+                (NOT(ISBLANK(_CPI)) && _CPI>=1) && (NOT(ISBLANK(_SPI)) && _SPI>=1),"Healthy")
+RETURN _Result
+```
+
+</details>
+
+#### 📈 YTD (Year-To-Date - Acumulado Anual)
+<details>
+<summary>Ver medidas YTD</summary>
+
+
+#AC_YTD - Costo Real Acumulado Anual
+
+```dax
+VAR _DateMax = EOMONTH(TODAY(),0)
+VAR _Result = IF(
+    MAX(DimCalendar[Date]) <= _DateMax,
+    TOTALYTD([#AC], DimCalendar[Date], DimCalendar[Date] <= _DateMax),
+    BLANK()
+)
+RETURN _Result
+```
+
+#BU_YTD - Presupuesto Acumulado Anual
+
+```dax
+VAR _DateMax = EOMONTH(TODAY(),0)
+VAR _Result = IF(
+    MAX(DimCalendar[Date]) <= _DateMax,
+    TOTALYTD([#BU], DimCalendar[Date], DimCalendar[Date] <= _DateMax),
+    BLANK()
+)
+RETURN _Result
+```
+
+#EV_YTD - Valor Ganado Acumulado Anual
+
+```dax
+VAR _Todaydate = EOMONTH(TODAY(),0)
+VAR _Result = IF(MAX(DimCalendar[Date]) <= _Todaydate,[#EV],BLANK())
+RETURN _Result
+```
+#PV_YTD - Valor Planificado Acumulado Anual
+
+```dax
+VAR _Todaydate = EOMONTH(TODAY(),0)
+VAR _Result = IF(MAX(DimCalendar[Date]) <= _Todaydate,[#PV],BLANK())
+RETURN _Result
+```
+
+</details>
+
+#### 🎨 Visuals (Visualizaciones HTML + DAX)
+<details>
+<summary>Ver CardOverview (Tarjetas KPI con diseño moderno)</summary>
+
+
+Esta medida genera un dashboard HTML dinámico con tarjetas estilizadas usando gradientes CSS:
+
+```dax
+VAR _VirtualProjectsTable = 
+  CALCULATETABLE(
+      ADDCOLUMNS(
+          SUMMARIZE(DimProjects, DimProjects[project_id]),
+          "@Status", [Status],
+          "@StatusAlert", [Status_Alert]
+      ),
+      ALLSELECTED()
+  )
+VAR _Budget_Format = 
+    SWITCH(TRUE(),
+        [#BU] >= 1000000, FORMAT([#BU] / 1000000, "$0.0") & "M",
+        [#BU] >= 1000, FORMAT([#BU] / 1000, "$0.0") & "K",
+        FORMAT([#BU], "$#,##0")
+    )
+VAR _AC_Format = 
+    SWITCH(TRUE(),
+        [#AC] >= 1000000, FORMAT([#AC] / 1000000, "$0.0") & "M",
+        [#AC] >= 1000, FORMAT([#AC] / 1000, "$0.0") & "K",
+        FORMAT([#AC], "$#,##0")
+    )
+[... Continuación con formatos para CV, EAC, VAC, CPI, SPI ...]
+VAR _CountDone = COUNTROWS(FILTER(_VirtualProjectsTable, [@Status] = "Done"))
+VAR _CountInProgress = COUNTROWS(FILTER(_VirtualProjectsTable, [@Status] = "In Progress"))
+VAR _CountToDo = COUNTROWS(FILTER(_VirtualProjectsTable, [@Status] = "To Do"))
+VAR _CountAtRisk = COUNTROWS(FILTER(_VirtualProjectsTable, [@StatusAlert] = "Critical" || [@StatusAlert] = "At Risk"))
+
+RETURN
+"
+<html lang='es'>
+<style>
+:root{
+    --bg:#f4f7fb;
+    --card-radius:18px;
+    --shadow:0 10px 25px rgba(0,0,0,.10);
+    --text:#ffffff;
+}
+[... CSS completo con gradientes y estilos ...]
+</style>
+<body>
+<div class='kpi-grid'>
+    <!-- 12 tarjetas KPI con iconos y valores dinámicos -->
+</div>
+</body>
+</html>
+"
+```
+
+Esta medida incluye diseño responsivo con grid CSS, efectos hover, iconos emoji y formateo automático de números (K, M).
+</details>
+
+## 🖼️ Vistas Previas del Proyecto
+<details>
+<summary>📸 Ver Capturas de Pantalla</summary>
+
+
+Página Overview
+<img width="1924" height="1070" alt="Overview Dashboard" src="https://github.com/user-attachments/assets/3fb03df8-501b-4d0c-aae9-e0393e3b4d21" />
+
+Página Project Details
+<img width="1930" height="1068" alt="Project Details" src="https://github.com/user-attachments/assets/ee660bad-d843-4dd2-a1da-fdf3dcef3073" />
+
+Página Analysis
+<img width="1920" height="1071" alt="Analysis Dashboard" src="https://github.com/user-attachments/assets/e0e5f555-9c72-4518-84be-d68d4a6ad3cf" />
+</details>
+
+<details>
+<summary>🎥 Ver Video Demostrativo</summary>
+
+   
+   Ver en YouTube: https://youtu.be/waNBncOlGs4
+</details>
+
+## 👤 Autor
+Giancarlo Barrantes
+
+Business Intelligence Developer | Power BI Specialist
+
+
+<a href="https://www.linkedin.com/in/gb25"><img width="70" height="20" alt="image" src="https://github.com/user-attachments/assets/e0d69586-c6f9-4f66-9a3d-bc8dfa146463" /></a>
+<a href="https://www.instagram.com/gbarrantes25"><img width="70" height="20" alt="image" src="https://github.com/user-attachments/assets/68773029-5e0f-49da-92e9-fb93a223dd09" />
+</a>
+<a href="https://www.tiktok.com/@gbarrantes25"><img width="65" height="20" alt="image" src="https://github.com/user-attachments/assets/349c87c0-1f3a-4368-8517-64a6012565c0" /></a>
+<a href="https://www.youtube.com/@gbarrantes25"><img width="70" height="20" alt="image" src="https://github.com/user-attachments/assets/d9e2cb69-29ec-47fc-93ae-30896a7b533d" />
+</a>
+
+## 📝 Licencia
+Este proyecto está bajo la Licencia MIT - ver el archivo <a href="https://mit-license.org/">LICENSE</a> para más detalles.
+
+## ⭐ Agradecimientos
+Si este proyecto te resultó útil, considera darle una ⭐ en GitHub y compartirlo con otros profesionales de Business Intelligence.
+
+<div align="center">
+   Hecho por <a href="https://gbarrantes25.github.io/">Giancarlo Barrantes</a>
+</div>
