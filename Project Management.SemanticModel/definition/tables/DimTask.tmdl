@@ -1,0 +1,106 @@
+table DimTask
+	lineageTag: 149a7cc2-ca5d-45c1-ac31-423c9c80dccd
+
+	column task_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a2cbcdcf-e4eb-45b0-87ca-a9d40c2d6969
+		summarizeBy: none
+		sourceColumn: task_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_name
+		dataType: string
+		lineageTag: 41b20b94-08f0-43a7-9d33-f6e70e85bbff
+		summarizeBy: none
+		sourceColumn: task_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_id
+		dataType: int64
+		formatString: 0
+		lineageTag: ca8f1eee-14f3-4996-a2a6-e3db41edea12
+		summarizeBy: none
+		sourceColumn: project_id
+
+		annotation SummarizationSetBy = User
+
+	column planned_startdate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 3cc6fef5-7d41-4c09-a69d-f8c8edf429a7
+		summarizeBy: none
+		sourceColumn: planned_startdate
+
+		variation Variación
+			isDefault
+			relationship: b41ee64c-4ac2-45b2-998d-ed85b44baee9
+			defaultHierarchy: LocalDateTable_4dea2446-61d9-4956-a30e-88862fa2d6e6.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column planned_enddate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: e9613e15-af64-4f97-a6af-72a1b7a19acd
+		summarizeBy: none
+		sourceColumn: planned_enddate
+
+		variation Variación
+			isDefault
+			relationship: 87f64ef6-1628-48cf-a780-29438fbf56f7
+			defaultHierarchy: LocalDateTable_334b1ea4-a3b4-4f4b-9ab8-0b9fb980778a.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Real_StartDate = [RealStartDate]
+		formatString: dd/mm/yyyy
+		lineageTag: 5bc07e56-e035-43c4-94c3-3beac434767d
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 069b3e31-083b-4ebc-abf3-adb3b1ed4223
+			defaultHierarchy: LocalDateTable_377e216a-79a6-4148-a26d-d929f1c85830.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Real_EndDate = [RealEndDate]
+		formatString: dd/mm/yyyy
+		lineageTag: 8cf9f0fa-9bf0-4d89-8a92-c3b4bdd5893a
+		summarizeBy: none
+
+		variation Variación
+			isDefault
+			relationship: 91510726-65e8-4550-9b1a-bdebc65d124c
+			defaultHierarchy: LocalDateTable_66a6c7b1-8245-4858-a821-32e719ee307e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition DimTask = m
+		mode: import
+		source =
+				let
+				    Origen = Value.NativeQuery(PostgreSQL.Database("ep-odd-moon-aj7fxpfo-pooler.c-3.us-east-2.aws.neon.tech", "neondb"), "  SELECT #(lf)     DISTINCT task_id,task_name,project_id,planned_startdate,planned_enddate#(lf)  from projects order BY task_id ASC", null, [EnableFolding=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"planned_startdate", type date}, {"planned_enddate", type date}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

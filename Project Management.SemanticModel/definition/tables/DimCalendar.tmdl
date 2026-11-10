@@ -1,0 +1,103 @@
+table DimCalendar
+	lineageTag: f726f406-2ec2-4ccc-a7a1-594e83fc28e5
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: dd/mm/yyyy
+		lineageTag: 043b5471-002a-43c5-ab44-5c866c6df424
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column #Year
+		formatString: 0
+		lineageTag: 14341656-91d4-466d-b7e4-9fdcfa28c0cd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Year]
+
+		annotation SummarizationSetBy = User
+
+	column #Quarter
+		formatString: 0
+		lineageTag: f0d92441-07a9-4c03-9ea9-11cb4848c7bd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Quarter]
+
+		annotation SummarizationSetBy = User
+
+	column #Month
+		formatString: 0
+		lineageTag: 71576bb2-0fba-4911-8b6e-a39ef0c10b93
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Month]
+
+		annotation SummarizationSetBy = User
+
+	column #Day
+		formatString: 0
+		lineageTag: 4323f1b8-215f-41c8-a1a3-126c6bf13e4f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column #WeekDay
+		formatString: 0
+		lineageTag: ae65bbfd-ed1d-4ee5-af9c-9cfe7b7c5e96
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [#WeekDay]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		lineageTag: 5d1e07f9-e8df-495c-9fc4-8be67dc5a7c5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day]
+		sortByColumn: #WeekDay
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNum
+		formatString: 0
+		lineageTag: a9b11fa8-2b62-41db-bc1b-57114b706a93
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WeekNum]
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy '#Year Jerarquía'
+		lineageTag: c0bcf9ea-082e-4826-b2d5-e60f59cf2fcd
+
+		level Year
+			lineageTag: eeb19a83-8854-4118-890e-facb11da7b1e
+			column: #Year
+
+		level Month
+			lineageTag: 16a9f79d-f631-43c5-b303-4ead6d677692
+			column: #Month
+
+	partition DimCalendar = calculated
+		mode: import
+		source =
+				ADDCOLUMNS(CALENDARAUTO(),
+				                    "#Year",YEAR([Date]),
+				                    "#Quarter",QUARTER([Date]),
+				                    "#Month",MONTH([Date]),
+				                    "#Day",Day([Date]),
+				                    "#WeekDay",WEEKDAY([Date]),"Day",FORMAT(WEEKDAY([Date]),"DDD"),
+				                    "WeekNum",WEEKNUM([Date]))
+
+	annotation PBI_Id = 0e47fd59f53c45fe9cecaa0acd7caba6
+

@@ -1,0 +1,32 @@
+table DimProjectManagement
+	lineageTag: fbd01520-8c7c-4f89-8733-e798641aa72f
+
+	column project_management_id
+		dataType: int64
+		formatString: 0
+		lineageTag: c02079f9-c86e-4ec0-8ad2-4005f229a491
+		summarizeBy: none
+		sourceColumn: project_management_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_management
+		dataType: string
+		lineageTag: 710fe9f3-21cd-4f71-98ef-24c7fa09a017
+		summarizeBy: none
+		sourceColumn: project_management
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProjectManagement = m
+		mode: import
+		source =
+				let
+				    Origen = Value.NativeQuery(PostgreSQL.Database("ep-odd-moon-aj7fxpfo-pooler.c-3.us-east-2.aws.neon.tech", "neondb"), "SELECT DISTINCT project_management_id,project_management FROM projects ORDER BY project_management_id", null, [EnableFolding=true])
+				in
+				    Origen
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

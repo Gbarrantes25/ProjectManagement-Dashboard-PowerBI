@@ -1,0 +1,35 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-PE
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["DateSource","DimProjects","DimProjectManagement","DimPhase","Fact_Task","Measure","DimTask"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","TMDLView_Desktop","DevMode"]
+
+ref table DateSource
+ref table DateTableTemplate_80f42aa2-9ff1-4a4b-af63-6192de96b1d8
+ref table LocalDateTable_2ef66682-efd6-4741-a9e2-9b49a966095c
+ref table DimProjects
+ref table DimProjectManagement
+ref table DimPhase
+ref table Fact_Task
+ref table DimCalendar
+ref table Measure
+ref table LocalDateTable_7b9aedc9-d799-458c-a1a5-cc4e3e7f31e6
+ref table LocalDateTable_31fb872b-393d-4fcf-8cfc-26451fe9e4a0
+ref table LocalDateTable_1fa89442-eb18-4492-9e5a-b9731d557921
+ref table LocalDateTable_56dc9b48-fe40-4f9d-93cb-20f134da285e
+ref table DimTask
+ref table LocalDateTable_4dea2446-61d9-4956-a30e-88862fa2d6e6
+ref table LocalDateTable_334b1ea4-a3b4-4f4b-9ab8-0b9fb980778a
+ref table LocalDateTable_377e216a-79a6-4148-a26d-d929f1c85830
+ref table LocalDateTable_66a6c7b1-8245-4858-a821-32e719ee307e
+
+ref cultureInfo es-ES
+

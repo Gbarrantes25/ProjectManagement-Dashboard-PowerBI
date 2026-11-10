@@ -1,0 +1,183 @@
+table Fact_Task
+	lineageTag: f1fe084f-eff7-43b5-bb79-48b118ead655
+
+	column task_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 89b2fc01-063a-4401-81b2-b8b7080924a4
+		summarizeBy: none
+		sourceColumn: task_id
+
+		annotation SummarizationSetBy = User
+
+	column task_name
+		dataType: string
+		lineageTag: d3ea77d8-a1ec-4fa0-a4e5-cdcc9bced6c9
+		summarizeBy: none
+		sourceColumn: task_name
+		sortByColumn: task_id
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 99aba2cd-3002-4c03-8332-7f1a3b9ee96c
+		summarizeBy: none
+		sourceColumn: project_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_management_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 77673507-aa87-48bb-9582-ba64ace74abc
+		summarizeBy: none
+		sourceColumn: project_management_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column phase_id
+		dataType: int64
+		formatString: 0
+		lineageTag: f86e042e-12ae-43f8-a027-058cef1be7a1
+		summarizeBy: none
+		sourceColumn: phase_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column phase_weight
+		dataType: double
+		lineageTag: 788c4495-d2fd-4c4a-bec4-30cd2d249509
+		summarizeBy: none
+		sourceColumn: phase_weight
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column owner
+		dataType: string
+		lineageTag: dbc3f4e4-cc76-42f6-8587-299bde640202
+		summarizeBy: none
+		sourceColumn: owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_startdate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 98c680e3-2375-4229-9a87-88ddbb922657
+		summarizeBy: none
+		sourceColumn: planned_startdate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column planned_enddate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 0815af93-21c2-47ed-90f4-6757b5647654
+		summarizeBy: none
+		sourceColumn: planned_enddate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column real_startdate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 8ba63f5f-4cae-4d92-8a6f-61dac6581279
+		summarizeBy: none
+		sourceColumn: real_startdate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column real_enddate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 7b2ef500-0aee-40f8-b92e-c15a26e4be37
+		summarizeBy: none
+		sourceColumn: real_enddate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column budget
+		dataType: double
+		formatString: 0.00
+		lineageTag: 4a5c179a-b1bc-4016-9312-0d813510e1c6
+		summarizeBy: none
+		sourceColumn: budget
+
+		annotation SummarizationSetBy = User
+
+	column ac
+		dataType: double
+		formatString: 0.00
+		lineageTag: cdc0ae1b-5382-4792-ad4a-23eeb86654e1
+		summarizeBy: none
+		sourceColumn: ac
+
+		annotation SummarizationSetBy = User
+
+	column id
+		dataType: int64
+		formatString: 0
+		lineageTag: 6221dde4-3a49-4c29-a6b5-94ee2fb3ac37
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = User
+
+	column progress_acc
+		dataType: double
+		lineageTag: 28f836c5-4325-4428-9b84-6c5e9b865add
+		summarizeBy: none
+		sourceColumn: progress_acc
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column data_date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 0a5ee45f-83d8-4a63-af68-43c06b75b630
+		summarizeBy: none
+		sourceColumn: data_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition Fact_Task = m
+		mode: import
+		source =
+				let
+				    Origen = Value.NativeQuery(PostgreSQL.Database("ep-odd-moon-aj7fxpfo-pooler.c-3.us-east-2.aws.neon.tech", "neondb"), "SELECT #(lf)    Id,#(lf)    task_id,#(lf)    task_name,#(lf)    project_id,#(lf)    project_management_id#(lf)    ,phase_id,#(lf)    phase_weight,#(lf)    ""owner"" ,#(lf)    planned_startdate,#(lf)    planned_enddate,#(lf)    real_startdate,#(lf)    real_enddate,#(lf)    budget,#(lf)    AC,#(lf)    Progress_Acc,#(lf)    Data_Date#(lf)from projects", null, [EnableFolding=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"planned_startdate", type date}, {"planned_enddate", type date}, {"real_startdate", type date}, {"real_enddate", type date}, {"data_date", type date}})
+				in
+				    #"Tipo cambiado"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
